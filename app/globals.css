@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fff7f2;
+  --foreground: #171717;
+  --vd-ink: #1c1917;
+  --vd-muted: #78716c;
+  --vd-soft: #f5eee9;
+  --vd-border: #eadfd8;
+  --vd-card: #fffdfb;
+  --vd-rose: #e11d48;
+  --vd-plum: #7c2d5a;
+  --vd-gold: #f59e0b;
+  --vd-shadow: 0 24px 80px rgb(124 45 90 / 0.14);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0c0a09;
+    --foreground: #fafaf9;
+    --vd-ink: #fafaf9;
+    --vd-muted: #a8a29e;
+    --vd-soft: #1c1917;
+    --vd-border: #34251f;
+    --vd-card: #18120f;
+    --vd-rose: #fb7185;
+    --vd-plum: #d8b4fe;
+    --vd-gold: #fbbf24;
+    --vd-shadow: 0 24px 90px rgb(0 0 0 / 0.34);
+  }
+}
+
+body {
+  background:
+    radial-gradient(
+      60% 48% at 8% 5%,
+      color-mix(in oklab, var(--vd-gold) 18%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      120% 80% at 50% -10%,
+      color-mix(in oklab, var(--vd-rose) 20%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      55% 50% at 100% 8%,
+      color-mix(in oklab, var(--vd-plum) 15%, transparent),
+      transparent 72%
+    ),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--vd-rose) 28%, transparent);
+}
+
+.vd-glass {
+  border: 1px solid color-mix(in oklab, var(--vd-border) 78%, transparent);
+  background: color-mix(in oklab, var(--vd-card) 78%, transparent);
+  box-shadow: var(--vd-shadow);
+  backdrop-filter: blur(18px);
+}
+
+.vd-kicker {
+  color: var(--vd-rose);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
