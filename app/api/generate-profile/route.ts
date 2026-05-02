@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { CARDS, findOption } from "@/content/cards";
+import {
+  CARDS,
+  PERSONALIZATION_CARDS,
+  findOption,
+  findPersonalizationOption,
+} from "@/content/cards";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { composeProfile, type GeneratedProfile } from "@/lib/profileComposer";
@@ -21,6 +26,18 @@ function isSelectionMap(value: unknown): value is SelectionMap {
   if (!value || typeof value !== "object") return false;
   const selections = value as Record<string, unknown>;
   return CARDS.every(
+    (card) =>
+      typeof selections[card.id] === "string" &&
+      selections[card.id] !== undefined,
+  );
+}
+
+function isPersonalizationMap(
+  value: unknown,
+): value is Record<string, string> {
+  if (!value || typeof value !== "object") return false;
+  const selections = value as Record<string, unknown>;
+  return PERSONALIZATION_CARDS.every(
     (card) =>
       typeof selections[card.id] === "string" &&
       selections[card.id] !== undefined,
@@ -107,6 +124,20 @@ function getSelectedAnswers(
   });
 }
 
+function getPersonalizationAnswers(personalization: Record<string, string>) {
+  return PERSONALIZATION_CARDS.map((card) => {
+    const optionId = personalization[card.id];
+    const option = optionId
+      ? findPersonalizationOption(card.id, optionId)
+      : undefined;
+    return {
+      question: card.prompt,
+      answer: option?.label ?? optionId ?? "No answer",
+      promptHint: option?.promptHint ?? "",
+    };
+  });
+}
+
 const BASIC_INFO_LABELS: Record<string, string> = {
   man: "Man",
   woman: "Woman",
@@ -144,8 +175,10 @@ function buildPrompt(
   selections: SelectionMap,
   customTexts: Record<string, string>,
   basicInfo: Record<string, string>,
+  personalization: Record<string, string>,
   rankedTraits: ReturnType<typeof rankTraits>,
   fallback: GeneratedProfile,
+  variationSeed: string,
 ) {
   const identity = labelBasicInfo(basicInfo);
   return [
@@ -180,11 +213,14 @@ function buildPrompt(
             "Write ALL profile fields in first person (I / me / my). Never use you/your.",
             "Do not mention OpenRouter, LLMs, tools, hidden scoring, or JSON.",
             "Keep it modern and human — not overly polished or clinical.",
-            "Incorporate any custom free-text answers naturally into the profile.",
+            "Use the personalization choices to make the copy specific, not cookie-cutter.",
+            "Use the variation seed only to vary phrasing, sentence rhythm, and word choice. Do not invent new facts.",
             "Use the fallback only as a style reference, not as text to copy.",
           ],
           selectedAnswers: getSelectedAnswers(selections, customTexts),
+          personalizationChoices: getPersonalizationAnswers(personalization),
           rankedTraits: rankedTraits.filter((trait) => trait.score > 0),
+          variationSeed,
           fallbackStyleReference: fallback,
         },
         null,
@@ -200,6 +236,8 @@ async function generateWithOpenRouter(
   rankedTraits: ReturnType<typeof rankTraits>,
   customTexts: Record<string, string>,
   basicInfo: Record<string, string>,
+  personalization: Record<string, string>,
+  variationSeed: string,
 ): Promise<GenerateProfileResponse> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   const model = process.env.OPENROUTER_MODEL ?? DEFAULT_MODEL;
@@ -227,10 +265,12 @@ async function generateWithOpenRouter(
         selections,
         customTexts,
         basicInfo,
+        personalization,
         rankedTraits,
         fallback,
+        variationSeed,
       ),
-      temperature: 0.8,
+      temperature: 0.9,
       response_format: { type: "json_object" },
     }),
   });
@@ -312,10 +352,12 @@ export async function POST(request: Request) {
   const {
     selections,
     basicInfo = {},
+    personalization = {},
     customTexts = {},
   } = (body ?? {}) as {
     selections?: unknown;
     basicInfo?: Record<string, string>;
+    personalization?: unknown;
     customTexts?: Record<string, string>;
   };
 
@@ -326,9 +368,17 @@ export async function POST(request: Request) {
     );
   }
 
+  if (!isPersonalizationMap(personalization)) {
+    return NextResponse.json(
+      { error: "Personalization must include one valid option id per card." },
+      { status: 400 },
+    );
+  }
+
   const scores = aggregateTraits(selections);
   const rankedTraits = rankTraits(scores);
   const fallback = composeProfile(rankedTraits);
+  const variationSeed = `${user.id}:${Date.now()}`;
 
   const saveProfile = async (
     result: GenerateProfileResponse,
@@ -337,7 +387,10 @@ export async function POST(request: Request) {
       data: {
         userId: user.id,
         responsesJson: JSON.stringify(
-          getSelectedAnswers(selections, customTexts),
+          {
+            scenarios: getSelectedAnswers(selections, customTexts),
+            personalization: getPersonalizationAnswers(personalization),
+          },
         ),
         traitScoresJson: JSON.stringify(scores),
         generatedProfileJson: JSON.stringify(result.profile),
@@ -358,6 +411,8 @@ export async function POST(request: Request) {
       rankedTraits,
       customTexts,
       basicInfo,
+      personalization,
+      variationSeed,
     );
     const profileId = await saveProfile(result);
     return NextResponse.json({ ...result, profileId });

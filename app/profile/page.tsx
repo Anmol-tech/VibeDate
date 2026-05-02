@@ -163,28 +163,12 @@ export default async function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col justify-between p-6 sm:p-8">
+                <div className="flex flex-col justify-center p-6 sm:p-8">
                   <div>
                     <p className="vd-kicker">About me</p>
                     <p className="mt-4 max-w-2xl text-2xl font-semibold leading-tight tracking-[-0.035em] text-[var(--vd-ink)]">
                       {profile.bio}
                     </p>
-                  </div>
-
-                  <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                    {profile.traitLabels.slice(0, 3).map((label, index) => (
-                      <div
-                        key={label}
-                        className="rounded-[1.35rem] border border-[var(--vd-border)] bg-[var(--vd-soft)] p-4"
-                      >
-                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--vd-muted)]">
-                          Signal {index + 1}
-                        </p>
-                        <p className="mt-2 text-sm font-semibold text-[var(--vd-ink)]">
-                          {label}
-                        </p>
-                      </div>
-                    ))}
                   </div>
                 </div>
               </div>

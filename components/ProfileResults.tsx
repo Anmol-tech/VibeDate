@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CARDS } from "@/content/cards";
+import { CARDS, PERSONALIZATION_CARDS } from "@/content/cards";
 import { SELECTIONS_STORAGE_KEY, type StoredWizardData } from "@/lib/constants";
 import type { GeneratedProfile } from "@/lib/profileComposer";
 
@@ -20,8 +20,13 @@ function isValidWizardData(raw: unknown): raw is StoredWizardData {
   if (!raw || typeof raw !== "object") return false;
   const d = raw as Record<string, unknown>;
   if (!d.selections || typeof d.selections !== "object") return false;
+  if (!d.personalization || typeof d.personalization !== "object") return false;
   const sel = d.selections as Record<string, unknown>;
-  return CARDS.every((c) => typeof sel[c.id] === "string");
+  const personalization = d.personalization as Record<string, unknown>;
+  return (
+    CARDS.every((c) => typeof sel[c.id] === "string") &&
+    PERSONALIZATION_CARDS.every((c) => typeof personalization[c.id] === "string")
+  );
 }
 
 export function ProfileResults() {
@@ -59,6 +64,7 @@ export function ProfileResults() {
             body: JSON.stringify({
               basicInfo: parsed.basicInfo ?? {},
               selections: parsed.selections,
+              personalization: parsed.personalization,
               customTexts: parsed.customTexts ?? {},
             }),
             signal: controller.signal,

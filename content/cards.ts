@@ -506,8 +506,142 @@ export const BASIC_INFO_CARDS: BasicInfoCard[] = [
   },
 ];
 
+// ─── Choice-only personalization cards (shown after scenarios) ───────────────
+
+export type PersonalizationOption = {
+  id: string;
+  label: string;
+  promptHint: string;
+};
+
+export type PersonalizationCard = {
+  id: string;
+  prompt: string;
+  category: "tone" | "micro-preference";
+  options: PersonalizationOption[];
+};
+
+export const PERSONALIZATION_CARDS: PersonalizationCard[] = [
+  {
+    id: "profile-tone",
+    prompt: "What should your profile sound like?",
+    category: "tone",
+    options: [
+      {
+        id: "warm-sincere",
+        label: "Warm and sincere",
+        promptHint: "Use grounded, heartfelt language without sounding intense.",
+      },
+      {
+        id: "playful-witty",
+        label: "Playful and witty",
+        promptHint: "Use light humor and a conversational rhythm.",
+      },
+      {
+        id: "calm-thoughtful",
+        label: "Calm and thoughtful",
+        promptHint: "Use reflective language with a relaxed pace.",
+      },
+      {
+        id: "direct-confident",
+        label: "Direct and confident",
+        promptHint: "Use clear, self-assured phrasing without bragging.",
+      },
+    ],
+  },
+  {
+    id: "humor-style",
+    prompt: "What kind of humor feels most like you?",
+    category: "micro-preference",
+    options: [
+      {
+        id: "dry-one-liners",
+        label: "Dry one-liners",
+        promptHint: "Let the profile feel subtly funny, not loud.",
+      },
+      {
+        id: "warm-goofy",
+        label: "Warm and goofy",
+        promptHint: "Make the profile feel approachable and lightly silly.",
+      },
+      {
+        id: "observational",
+        label: "Observational and specific",
+        promptHint: "Use tiny lived-in details and smart observations.",
+      },
+      {
+        id: "gentle-teasing",
+        label: "Gentle teasing, never mean",
+        promptHint: "Keep humor kind, flirty, and low-pressure.",
+      },
+    ],
+  },
+  {
+    id: "small-ritual",
+    prompt: "Pick a small ritual that feels dateable.",
+    category: "micro-preference",
+    options: [
+      {
+        id: "matcha-walks",
+        label: "Matcha walks and people-watching",
+        promptHint: "Include a cozy city-walk detail if it fits.",
+      },
+      {
+        id: "late-night-tacos",
+        label: "Late-night tacos after a long day",
+        promptHint: "Include a casual food adventure detail if it fits.",
+      },
+      {
+        id: "bookstore-laps",
+        label: "Bookstore laps with no agenda",
+        promptHint: "Include a bookstore or slow-browse detail if it fits.",
+      },
+      {
+        id: "playlist-swap",
+        label: "Swapping playlists on the way home",
+        promptHint: "Include a music-sharing detail if it fits.",
+      },
+    ],
+  },
+  {
+    id: "date-detail",
+    prompt: "What first-date detail would make you smile?",
+    category: "micro-preference",
+    options: [
+      {
+        id: "corner-booth",
+        label: "A corner booth where conversation feels easy",
+        promptHint: "Make the date preference feel intimate and conversational.",
+      },
+      {
+        id: "arcade-rematch",
+        label: "An arcade game with an unnecessary rematch",
+        promptHint: "Make the date preference feel playful and active.",
+      },
+      {
+        id: "farmers-market",
+        label: "A farmers market and choosing snacks together",
+        promptHint: "Make the date preference feel warm, casual, and specific.",
+      },
+      {
+        id: "tiny-gallery",
+        label: "A tiny gallery where we invent opinions",
+        promptHint: "Make the date preference feel curious and lightly witty.",
+      },
+    ],
+  },
+];
+
 export function getTotalCards(): number {
   return CARDS.length;
+}
+
+export function findPersonalizationOption(
+  cardId: string,
+  optionId: string,
+): PersonalizationOption | undefined {
+  const card = PERSONALIZATION_CARDS.find((c) => c.id === cardId);
+  return card?.options.find((o) => o.id === optionId);
 }
 
 export function findOption(

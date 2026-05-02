@@ -1,11 +1,13 @@
-/** sessionStorage key — bumped to v2 when StoredWizardData shape changed */
-export const SELECTIONS_STORAGE_KEY = "vibedate.wizard.v2";
+/** sessionStorage key — bumped when StoredWizardData shape changes */
+export const SELECTIONS_STORAGE_KEY = "vibedate.wizard.v3";
 
 export type StoredWizardData = {
   /** Answers to the basic-info questions (gender, looking-for, intent) */
   basicInfo: Record<string, string>;
-  /** Scenario card selections: cardId → optionId (or "custom") */
+  /** Scenario card selections: cardId → optionId */
   selections: Record<string, string>;
-  /** Free-text answers when the user chose "Other": cardId → text */
+  /** Choice-only personalization cards: cardId → optionId */
+  personalization: Record<string, string>;
+  /** Legacy support for old sessions that included "Other" free text. */
   customTexts: Record<string, string>;
 };

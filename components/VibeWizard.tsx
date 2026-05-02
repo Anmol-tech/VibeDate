@@ -1,76 +1,86 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   BASIC_INFO_CARDS,
   CARDS,
+  PERSONALIZATION_CARDS,
   type BasicInfoCard,
+  type PersonalizationCard,
   type ScenarioCard,
 } from "@/content/cards";
 import { SELECTIONS_STORAGE_KEY, type StoredWizardData } from "@/lib/constants";
 import type { SelectionMap } from "@/lib/traits";
 
-const TOTAL_STEPS = BASIC_INFO_CARDS.length + CARDS.length;
+const TOTAL_STEPS =
+  BASIC_INFO_CARDS.length + CARDS.length + PERSONALIZATION_CARDS.length;
 const BASIC_END = BASIC_INFO_CARDS.length;
+const SCENARIO_END = BASIC_END + CARDS.length;
 
 export function VibeWizard() {
   const router = useRouter();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [step, setStep] = useState(0);
   const [basicSelections, setBasicSelections] = useState<
     Record<string, string>
   >({});
   const [selections, setSelections] = useState<SelectionMap>({});
-  const [customTexts, setCustomTexts] = useState<Record<string, string>>({});
+  const [personalization, setPersonalization] = useState<
+    Record<string, string>
+  >({});
 
   const isBasicPhase = step < BASIC_END;
+  const isScenarioPhase = step >= BASIC_END && step < SCENARIO_END;
+  const isPersonalizationPhase = step >= SCENARIO_END;
   const basicCard: BasicInfoCard | undefined = isBasicPhase
     ? BASIC_INFO_CARDS[step]
     : undefined;
-  const scenarioCard: ScenarioCard | undefined = !isBasicPhase
+  const scenarioCard: ScenarioCard | undefined = isScenarioPhase
     ? CARDS[step - BASIC_END]
     : undefined;
-  const currentCardId = basicCard?.id ?? scenarioCard?.id;
+  const personalizationCard: PersonalizationCard | undefined =
+    isPersonalizationPhase
+      ? PERSONALIZATION_CARDS[step - SCENARIO_END]
+      : undefined;
+  const currentCardId =
+    basicCard?.id ?? scenarioCard?.id ?? personalizationCard?.id;
 
   const selectedForCard = isBasicPhase
     ? currentCardId
       ? basicSelections[currentCardId]
       : undefined
-    : currentCardId
-      ? selections[currentCardId]
-      : undefined;
+    : isScenarioPhase
+      ? currentCardId
+        ? selections[currentCardId]
+        : undefined
+      : currentCardId
+        ? personalization[currentCardId]
+        : undefined;
 
-  const isCustomSelected = !isBasicPhase && selectedForCard === "custom";
-  const customText = currentCardId ? (customTexts[currentCardId] ?? "") : "";
-  const canProceed =
-    selectedForCard !== undefined &&
-    (selectedForCard !== "custom" || customText.trim().length > 0);
+  const canProceed = selectedForCard !== undefined;
 
   const progressPct = ((step + 1) / TOTAL_STEPS) * 100;
   const completedCount =
-    Object.keys(basicSelections).length + Object.keys(selections).length;
+    Object.keys(basicSelections).length +
+    Object.keys(selections).length +
+    Object.keys(personalization).length;
 
   const choose = useCallback(
     (optionId: string) => {
       if (!currentCardId) return;
       if (isBasicPhase) {
         setBasicSelections((prev) => ({ ...prev, [currentCardId]: optionId }));
-      } else {
+      } else if (isScenarioPhase) {
         setSelections((prev) => ({ ...prev, [currentCardId]: optionId }));
-        if (optionId === "custom") {
-          setTimeout(() => textareaRef.current?.focus(), 60);
-        } else {
-          setCustomTexts((prev) => {
-            const next = { ...prev };
-            delete next[currentCardId];
-            return next;
-          });
-        }
+      } else {
+        setPersonalization((prev) => ({
+          ...prev,
+          [currentCardId]: optionId,
+        }));
       }
     },
-    [isBasicPhase, currentCardId],
+    [isBasicPhase, isScenarioPhase, currentCardId],
   );
 
   const goNext = useCallback(() => {
@@ -79,20 +89,21 @@ export function VibeWizard() {
       const data: StoredWizardData = {
         basicInfo: basicSelections,
         selections,
-        customTexts,
+        personalization,
+        customTexts: {},
       };
       sessionStorage.setItem(SELECTIONS_STORAGE_KEY, JSON.stringify(data));
       router.push("/results");
       return;
     }
     setStep((s) => s + 1);
-  }, [canProceed, step, basicSelections, selections, customTexts, router]);
+  }, [canProceed, step, basicSelections, selections, personalization, router]);
 
   const goBack = useCallback(() => {
     setStep((s) => Math.max(0, s - 1));
   }, []);
 
-  const currentCard = basicCard ?? scenarioCard;
+  const currentCard = basicCard ?? scenarioCard ?? personalizationCard;
   if (!currentCard) return null;
 
   const options = currentCard.options;
@@ -100,7 +111,9 @@ export function VibeWizard() {
 
   const phaseKicker = isBasicPhase
     ? `About you · ${step + 1} of ${BASIC_END}`
-    : `Scenario ${step - BASIC_END + 1} of ${CARDS.length}`;
+    : isScenarioPhase
+      ? `Scenario ${step - BASIC_END + 1} of ${CARDS.length}`
+      : `Personal style ${step - SCENARIO_END + 1} of ${PERSONALIZATION_CARDS.length}`;
 
   const ctaLabel =
     step >= TOTAL_STEPS - 1
@@ -118,7 +131,11 @@ export function VibeWizard() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="vd-kicker">
-              {isBasicPhase ? "Identity & preferences" : "Your lifestyle"}
+              {isBasicPhase
+                ? "Identity & preferences"
+                : isScenarioPhase
+                  ? "Your lifestyle"
+                  : "Personal details"}
             </p>
             <p className="mt-1 text-sm text-[var(--vd-muted)]">
               {completedCount} of {TOTAL_STEPS} answered
@@ -172,7 +189,6 @@ export function VibeWizard() {
               {currentCard.prompt}
             </span>
 
-            {/* Standard options */}
             {options.map((opt) => {
               const selected = selectedForCard === opt.id;
               return (
@@ -206,57 +222,6 @@ export function VibeWizard() {
                 </label>
               );
             })}
-
-            {/* "Other — describe it yourself" — scenario cards only */}
-            {!isBasicPhase && scenarioCard && (
-              <>
-                <label
-                  className={`group relative flex cursor-pointer touch-manipulation items-center gap-3 rounded-2xl border px-4 py-4 text-left text-[15px] leading-snug text-[var(--vd-ink)] transition-all outline-none sm:text-base has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[var(--vd-rose)] has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-[var(--background)] ${
-                    isCustomSelected
-                      ? "translate-y-[-1px] border-[var(--vd-plum)] bg-[color-mix(in_oklab,var(--vd-plum)_14%,var(--vd-card))] shadow-[0_14px_34px_color-mix(in_oklab,var(--vd-plum)_14%,transparent),0_0_0_1px_var(--vd-plum)]"
-                      : "border-dashed border-[var(--vd-border)] bg-[color-mix(in_oklab,var(--vd-card)_88%,transparent)] hover:-translate-y-0.5 hover:border-[var(--vd-plum)] hover:shadow-md"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name={groupName}
-                    value="custom"
-                    checked={isCustomSelected}
-                    onChange={() => choose("custom")}
-                    className="sr-only"
-                  />
-                  <span
-                    aria-hidden="true"
-                    className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border text-xs font-bold transition-all ${
-                      isCustomSelected
-                        ? "border-[var(--vd-plum)] bg-[var(--vd-plum)] text-white"
-                        : "border-[var(--vd-border)] text-transparent group-hover:border-[var(--vd-plum)]"
-                    }`}
-                  >
-                    ✏
-                  </span>
-                  <span className="flex-1 select-none text-[var(--vd-muted)]">
-                    Other — describe it yourself
-                  </span>
-                </label>
-
-                {isCustomSelected && (
-                  <textarea
-                    ref={textareaRef}
-                    value={customText}
-                    onChange={(e) =>
-                      setCustomTexts((prev) => ({
-                        ...prev,
-                        [scenarioCard.id]: e.target.value,
-                      }))
-                    }
-                    placeholder="Tell us in your own words…"
-                    rows={3}
-                    className="w-full rounded-2xl border border-[var(--vd-plum)] bg-[var(--vd-card)] px-4 py-3 text-[15px] leading-relaxed text-[var(--vd-ink)] outline-none ring-[var(--vd-plum)] transition placeholder:text-[var(--vd-muted)] focus:ring-2"
-                  />
-                )}
-              </>
-            )}
           </div>
         </div>
       </div>
