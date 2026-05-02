@@ -106,7 +106,7 @@ export function ProfileResults() {
           <div className="flex items-center gap-3">
             <div className="h-3 w-3 animate-pulse rounded-full bg-[var(--vd-rose)]" />
             <p className="text-sm font-semibold text-[var(--vd-muted)]">
-              Generating your OpenRouter profile snapshot...
+              Generating your profile snapshot...
             </p>
           </div>
           <div className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">

@@ -24,8 +24,8 @@ export default async function OnboardingPage() {
           </h1>
           <p className="mt-5 text-base leading-7 text-[var(--vd-muted)]">
             Answer a few lightweight scenario cards. VibeDate converts the
-            structured signal into an LLM-generated profile snapshot and saves
-            it to your account.
+            structured signal into a personalized profile snapshot and saves it
+            to your account.
           </p>
           <div className="mt-8 rounded-[1.5rem] border border-[var(--vd-border)] bg-[var(--vd-soft)] p-5">
             <h2 className="font-semibold text-[var(--vd-ink)]">

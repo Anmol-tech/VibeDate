@@ -246,7 +246,8 @@ async function generateWithOpenRouter(
     return {
       profile: fallback,
       source: "fallback",
-      warning: "OPENROUTER_API_KEY is not configured.",
+      warning:
+        "Personalized generation is not configured, so VibeDate used the local profile engine.",
     };
   }
 
@@ -276,12 +277,11 @@ async function generateWithOpenRouter(
   });
 
   if (!response.ok) {
-    const body = await response.text();
     return {
       profile: fallback,
       source: "fallback",
       model,
-      warning: `OpenRouter returned ${response.status}: ${body.slice(0, 180)}`,
+      warning: `Personalized generation was unavailable (${response.status}), so VibeDate used the local profile engine.`,
     };
   }
 
@@ -294,7 +294,8 @@ async function generateWithOpenRouter(
       profile: fallback,
       source: "fallback",
       model,
-      warning: "OpenRouter returned no message content.",
+      warning:
+        "Personalized generation returned an empty response, so VibeDate used the local profile engine.",
     };
   }
 
@@ -305,7 +306,8 @@ async function generateWithOpenRouter(
       profile: fallback,
       source: "fallback",
       model,
-      warning: "OpenRouter response did not match the expected profile shape.",
+      warning:
+        "Personalized generation returned an unexpected response, so VibeDate used the local profile engine.",
     };
   }
 

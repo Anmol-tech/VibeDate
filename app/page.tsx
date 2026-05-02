@@ -19,7 +19,7 @@ export default async function Home() {
               </h1>
               <p className="mt-5 max-w-xl text-pretty text-base leading-7 text-[var(--vd-muted)] sm:text-lg">
                 Pick through quick, concrete scenarios. VibeDate turns your
-                choices into an LLM-generated profile snapshot with a bio, vibe,
+                choices into a personalized profile snapshot with a bio, vibe,
                 communication style, date preferences, and match hints that are
                 saved to your dating profile.
               </p>
@@ -28,7 +28,7 @@ export default async function Home() {
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
               {[
                 ["10", "dating signals"],
-                ["LLM", "profile snapshot"],
+                ["1", "profile snapshot"],
                 ["0", "blank prompts"],
               ].map(([value, label]) => (
                 <div
@@ -77,7 +77,7 @@ export default async function Home() {
               [
                 "3",
                 "Generate and save",
-                "OpenRouter writes a profile snapshot, while Prisma stores the result.",
+                "VibeDate creates a profile snapshot and saves it to your account.",
               ],
             ].map(([step, title, copy]) => (
               <div
