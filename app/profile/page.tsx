@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -73,6 +74,16 @@ function getInitials(name: string): string {
     .join("");
 }
 
+async function regenerateProfileAction() {
+  "use server";
+
+  const user = await requireUser();
+  await prisma.profile.deleteMany({
+    where: { userId: user.id },
+  });
+  redirect("/onboarding");
+}
+
 export default async function ProfilePage() {
   const user = await requireUser();
   const latest = await prisma.profile.findFirst({
@@ -95,7 +106,7 @@ export default async function ProfilePage() {
     <main className="flex flex-1 flex-col px-4 py-5 sm:px-6 lg:px-8">
       <AppNav />
       <section className="mx-auto w-full max-w-6xl">
-        <div className="mb-8">
+        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="vd-kicker">Saved dating profile</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-[-0.04em] text-[var(--vd-ink)] sm:text-5xl">
@@ -105,6 +116,29 @@ export default async function ProfilePage() {
               This is the latest snapshot generated during onboarding.
             </p>
           </div>
+          {profile && (
+            <form action={regenerateProfileAction}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--vd-border)] bg-[var(--vd-card)] px-5 py-3 text-sm font-semibold text-[var(--vd-ink)] shadow-sm transition hover:border-[var(--vd-rose)] hover:text-[var(--vd-rose)]"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                  <path d="M21 3v6h-6" />
+                </svg>
+                Regenerate profile
+              </button>
+            </form>
+          )}
         </div>
 
         {!profile ? (
@@ -127,12 +161,7 @@ export default async function ProfilePage() {
                 <div className="relative min-h-[360px] overflow-hidden bg-[radial-gradient(circle_at_22%_18%,color-mix(in_oklab,var(--vd-gold)_52%,transparent),transparent_32%),radial-gradient(circle_at_82%_12%,color-mix(in_oklab,var(--vd-plum)_55%,transparent),transparent_36%),linear-gradient(145deg,var(--vd-rose),#421622_58%,#0d0908)] p-6 text-white sm:p-8">
                   <div className="absolute inset-0 bg-[linear-gradient(to_top,rgb(0_0_0_/_0.78),transparent_54%)]" />
                   <div className="relative flex items-center justify-between">
-                    <span className="rounded-full bg-white/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur">
-                      Profile preview
-                    </span>
-                    <span className="rounded-full border border-white/20 bg-black/15 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
-                      Live snapshot
-                    </span>
+                    
                   </div>
 
                   <div className="relative mt-12 flex items-center gap-5">

@@ -44,6 +44,10 @@ function isPersonalizationMap(
   );
 }
 
+function cleanProfileText(value: string): string {
+  return value.trim().replace(/\s*\u2014\s*/g, ", ");
+}
+
 function normalizeProfile(
   value: unknown,
   fallback: GeneratedProfile,
@@ -65,22 +69,28 @@ function normalizeProfile(
   }
 
   return {
-    bio: candidate.bio.trim() || fallback.bio,
-    datingVibe: candidate.datingVibe.trim() || fallback.datingVibe,
+    bio: cleanProfileText(candidate.bio) || cleanProfileText(fallback.bio),
+    datingVibe:
+      cleanProfileText(candidate.datingVibe) ||
+      cleanProfileText(fallback.datingVibe),
     communicationStyle:
-      candidate.communicationStyle.trim() || fallback.communicationStyle,
+      cleanProfileText(candidate.communicationStyle) ||
+      cleanProfileText(fallback.communicationStyle),
     firstDatePreference:
-      candidate.firstDatePreference.trim() || fallback.firstDatePreference,
+      cleanProfileText(candidate.firstDatePreference) ||
+      cleanProfileText(fallback.firstDatePreference),
     greenFlags: greenFlags
       .filter((item): item is string => typeof item === "string")
-      .map((item) => item.trim())
+      .map(cleanProfileText)
       .filter(Boolean)
       .slice(0, 4),
-    matchWellWith: candidate.matchWellWith.trim() || fallback.matchWellWith,
+    matchWellWith:
+      cleanProfileText(candidate.matchWellWith) ||
+      cleanProfileText(fallback.matchWellWith),
     traitLabels: Array.isArray(traitLabels)
       ? traitLabels
           .filter((item): item is string => typeof item === "string")
-          .map((item) => item.trim())
+          .map(cleanProfileText)
           .filter(Boolean)
           .slice(0, 4)
       : fallback.traitLabels,
@@ -185,7 +195,7 @@ function buildPrompt(
     {
       role: "system" as const,
       content:
-        "You are VibeDate, a tasteful dating-profile assistant. Generate specific, warm, non-cringey dating profile copy from the user's scenario choices. Write as if the user is describing themselves on a dating app, using first person only: I, me, my. Avoid therapy-speak, diagnoses, stereotypes, overclaiming, and second-person language. Use the user's gender and intent to inform tone naturally — do not mention them explicitly. Return only valid JSON.",
+        "You are VibeDate, a tasteful dating-profile assistant. Generate specific, warm, non-cringey dating profile copy from the user's scenario choices. Write as if the user is describing themselves on a dating app, using first person only: I, me, my. Avoid therapy-speak, diagnoses, stereotypes, overclaiming, and second-person language. Use the user's gender and intent to inform tone naturally; do not mention them explicitly. Return only valid JSON.",
     },
     {
       role: "user" as const,
@@ -212,7 +222,8 @@ function buildPrompt(
           constraints: [
             "Write ALL profile fields in first person (I / me / my). Never use you/your.",
             "Do not mention OpenRouter, LLMs, tools, hidden scoring, or JSON.",
-            "Keep it modern and human — not overly polished or clinical.",
+            "Do not use em dashes. Use commas, periods, parentheses, or short sentences instead.",
+            "Keep it modern and human, not overly polished or clinical.",
             "Use the personalization choices to make the copy specific, not cookie-cutter.",
             "Use the variation seed only to vary phrasing, sentence rhythm, and word choice. Do not invent new facts.",
             "Use the fallback only as a style reference, not as text to copy.",

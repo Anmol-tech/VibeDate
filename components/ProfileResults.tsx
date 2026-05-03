@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CARDS, PERSONALIZATION_CARDS } from "@/content/cards";
 import { SELECTIONS_STORAGE_KEY, type StoredWizardData } from "@/lib/constants";
 import type { GeneratedProfile } from "@/lib/profileComposer";
@@ -30,6 +31,7 @@ function isValidWizardData(raw: unknown): raw is StoredWizardData {
 }
 
 export function ProfileResults() {
+  const router = useRouter();
   const [ready, setReady] = useState(false);
   const [profile, setProfile] = useState<GeneratedProfile | null>(null);
   const [source, setSource] = useState<GenerationSource | null>(null);
@@ -81,6 +83,8 @@ export function ProfileResults() {
           setModel(data.model ?? null);
           setWarning(data.warning ?? null);
           sessionStorage.removeItem(SELECTIONS_STORAGE_KEY);
+          router.replace("/profile");
+          return;
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
@@ -97,7 +101,7 @@ export function ProfileResults() {
       controller.abort();
       cancelAnimationFrame(id);
     };
-  }, []);
+  }, [router]);
 
   if (!ready) {
     return (
@@ -106,7 +110,7 @@ export function ProfileResults() {
           <div className="flex items-center gap-3">
             <div className="h-3 w-3 animate-pulse rounded-full bg-[var(--vd-rose)]" />
             <p className="text-sm font-semibold text-[var(--vd-muted)]">
-              Generating your profile snapshot...
+              Generating and saving your profile...
             </p>
           </div>
           <div className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
