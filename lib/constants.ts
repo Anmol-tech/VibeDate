@@ -1,4 +1,4 @@
-/** sessionStorage key — bumped when StoredWizardData shape changes */
+/** sessionStorage key: bumped when StoredWizardData shape changes */
 export const SELECTIONS_STORAGE_KEY = "vibedate.wizard.v3";
 
 export type StoredWizardData = {

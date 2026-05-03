@@ -121,7 +121,7 @@ export const CARDS: ScenarioCard[] = [
     options: [
       {
         id: "match-energy",
-        label: "Reply in kind — I like depth early",
+        label: "Reply in kind, I like depth early",
         traitWeights: {
           thoughtful: 3,
           intentional: 2,
@@ -139,7 +139,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "need-time",
-        label: "Need a beat — I reply when I can give real attention",
+        label: "Need a beat, I reply when I can give real attention",
         traitWeights: {
           thoughtful: 2,
           intentional: 2,
@@ -148,7 +148,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "call-me",
-        label: "Suggest a quick call — tone is easier live",
+        label: "Suggest a quick call, tone is easier live",
         traitWeights: {
           direct: 3,
           social: 2,
@@ -172,7 +172,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "chemistry-first",
-        label: "Chemistry first — labels can come after there’s a spark",
+        label: "Chemistry first, labels can come after there’s a spark",
         traitWeights: {
           playful: 2,
           social: 2,
@@ -205,7 +205,7 @@ export const CARDS: ScenarioCard[] = [
     options: [
       {
         id: "inner-world",
-        label: "My inner world — values, taste, the way I think",
+        label: "My inner world, values, taste, the way I think",
         traitWeights: {
           thoughtful: 3,
           intentional: 2,
@@ -214,7 +214,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "life-energy",
-        label: "My energy — I’m fun to be around and easy to talk to",
+        label: "My energy, I’m fun to be around and easy to talk to",
         traitWeights: {
           playful: 3,
           social: 3,
@@ -222,7 +222,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "consistency",
-        label: "My consistency — I show up, follow through, and mean it",
+        label: "My consistency, I show up, follow through, and mean it",
         traitWeights: {
           intentional: 3,
           direct: 2,
@@ -231,7 +231,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "curiosity",
-        label: "My curiosity — I’m always learning, tasting, wandering",
+        label: "My curiosity, I’m always learning, tasting, wandering",
         traitWeights: {
           curious: 3,
           adventurous: 2,
@@ -246,7 +246,7 @@ export const CARDS: ScenarioCard[] = [
     options: [
       {
         id: "specific-prompts",
-        label: "Specific prompts — little details that feel lived-in",
+        label: "Specific prompts, little details that feel lived-in",
         traitWeights: {
           thoughtful: 2,
           curious: 2,
@@ -255,7 +255,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "warm-humor",
-        label: "Warm humor — clever, not mean",
+        label: "Warm humor, clever, not mean",
         traitWeights: {
           playful: 3,
           social: 1,
@@ -264,7 +264,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "clear-intentions",
-        label: "Clear intentions — no guessing what they’re here for",
+        label: "Clear intentions, no guessing what they’re here for",
         traitWeights: {
           direct: 3,
           intentional: 3,
@@ -272,7 +272,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "active-life",
-        label: "A life in motion — friends, hobbies, trips, projects",
+        label: "A life in motion, friends, hobbies, trips, projects",
         traitWeights: {
           adventurous: 2,
           social: 2,
@@ -314,7 +314,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "early-exit",
-        label: "Have an exit plan — big rooms drain me",
+        label: "Have an exit plan, big rooms drain me",
         traitWeights: {
           calm: 2,
           cozy: 2,
@@ -329,7 +329,7 @@ export const CARDS: ScenarioCard[] = [
     options: [
       {
         id: "dabble-play",
-        label: "Mess around until it clicks — play first",
+        label: "Mess around until it clicks, play first",
         traitWeights: {
           playful: 3,
           curious: 2,
@@ -356,7 +356,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "rabbit-hole",
-        label: "Go deep alone — weird Wikipedia journeys welcome",
+        label: "Go deep alone, weird Wikipedia journeys welcome",
         traitWeights: {
           thoughtful: 2,
           curious: 3,
@@ -372,7 +372,7 @@ export const CARDS: ScenarioCard[] = [
     options: [
       {
         id: "address-soon",
-        label: "Address it soon with clarity — don’t let it simmer",
+        label: "Address it soon with clarity, don’t let it simmer",
         traitWeights: {
           direct: 3,
           intentional: 2,
@@ -381,7 +381,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "gentle-timing",
-        label: "Pick a gentle moment — tone matters as much as facts",
+        label: "Pick a gentle moment, tone matters as much as facts",
         traitWeights: {
           thoughtful: 3,
           calm: 2,
@@ -433,7 +433,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "friends-energy",
-        label: "A little social energy — maybe friends bump into us",
+        label: "A little social energy, maybe friends bump into us",
         traitWeights: {
           social: 3,
           playful: 2,
@@ -441,7 +441,7 @@ export const CARDS: ScenarioCard[] = [
       },
       {
         id: "clear-plan",
-        label: "Still knowing the rough plan — surprises need guardrails",
+        label: "Still knowing the rough plan, surprises need guardrails",
         traitWeights: {
           intentional: 3,
           calm: 1,
@@ -452,7 +452,7 @@ export const CARDS: ScenarioCard[] = [
   },
 ];
 
-/** Options reference traits not in TRAIT_IDS — strip at aggregation time */
+/** Options may reference unknown traits; strip those at aggregation time. */
 export const KNOWN_TRAITS = new Set<string>(TRAIT_IDS);
 
 // ─── Basic identity / preference cards (shown before scenario cards) ──────────
@@ -489,7 +489,7 @@ export const BASIC_INFO_CARDS: BasicInfoCard[] = [
     options: [
       { id: "women", label: "Women" },
       { id: "men", label: "Men" },
-      { id: "everyone", label: "Everyone — I'm open" },
+      { id: "everyone", label: "Everyone, I'm open" },
       { id: "nonbinary-people", label: "Non-binary people" },
     ],
   },

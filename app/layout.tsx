@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VibeDate — profile builder",
+  title: "VibeDate: profile builder",
   description:
-    "Turn scenario choices into a structured dating profile — bio, vibe, communication style, and more.",
+    "Turn scenario choices into a structured dating profile: bio, vibe, communication style, and more.",
 };
 
 export default function RootLayout({

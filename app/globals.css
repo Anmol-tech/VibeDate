@@ -37,7 +37,26 @@
   }
 }
 
+html {
+  background: var(--background);
+}
+
 body {
+  position: relative;
+  isolation: isolate;
+  min-height: 100%;
+  overflow-x: hidden;
+  background: transparent;
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background:
     radial-gradient(
       60% 48% at 8% 5%,
@@ -55,8 +74,13 @@ body {
       transparent 72%
     ),
     var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
